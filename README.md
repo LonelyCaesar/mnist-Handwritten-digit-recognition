@@ -44,3 +44,42 @@
 
 	S1是隱藏狀態，代表神經網路上的記憶，是神經網路目前時間點的輸入X1加上上個時間點的狀態St-1，再加上U與W的參數，共同評估之結果：St = f(U * Xt + W * St-1)簡單來說就是前面的狀態會影響現在的狀態，現在的狀態也會影響以後的狀態。
 
+# 三、實作
+MNIST資料集是由紐約大學 Yann Le Cun 教授蒐集整理很多0~9的手寫數字圖片所形成的資料集，這是一個大型手寫數字資料庫，對於機器學習學者來說是初學者，圖片每張大小為28*28、皆為灰階影像，每個像素為0~255之數值、資料庫當中包含了60000筆的訓練資料、10000筆的測試資料。在MNIST資料集中，每一筆資料都是由下載好的mnist的資料實作出成果。
+![image](https://github.com/LonelyCaesar/mnist-Handwritten-digit-recognition/assets/101235367/6eaefabf-f3b5-4d60-b6e7-e4c6ea6ea2c3)
+
+1.	使用多層感知(MLP)進行辨識訓練：
+(1) 建立模型與資料結構：
+#### 程式碼
+```python
+#導入相關套件
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+from keras.datasets import mnist # keras.datasets：載入MNIST資料集
+from keras.models import Sequential # Keras：建立訓練模型
+from keras.layers import Dense, Activation, Dropout
+from keras.utils import np_utils
+import numpy as np # Numpy：矩陣運算
+%matplotlib inline # matplotlib.pyplot 將資料視覺化，可以圖表呈現結果
+import matplotlib.pyplot as plt
+(x_train_image, y_train_label), (x_test_image, y_test_label) = mnist.load_data() # 呼叫 load_data() 載入 MNIST 資料集
+nb_classes = 10 # 類別的數目
+x_train_image = x_train_image.reshape(60000, 784).astype('float32')
+x_test_image = x_test_image.reshape(10000, 784).astype('float32')
+# 壓縮圖片顏色至0 ~ 1
+x_train_image /= 255
+x_test_image /= 255
+#依分類數量將圖片標籤轉換格式的陣列
+y_train_cat = np_utils.to_categorical(y_train_label, nb_classes)
+y_test_cat = np_utils.to_categorical(y_test_label, nb_classes)
+model = Sequential()
+model.add(Dense(50, input_shape=(784,)))
+model.add(Dense(units=nb_classes))
+model.add(Activation('softmax'))
+# 定義定義損失函數、優化函數及成效衡量指標
+model.compile(loss='categorical_crossentropy', optimizer='SGD', metrics=['accuracy'])
+model.summary()
+```
+#### 執行結果
+![image](https://github.com/LonelyCaesar/mnist-Handwritten-digit-recognition/assets/101235367/991c9063-9246-4ce1-9c2d-d6e7745b8e47)
+
